@@ -89,9 +89,10 @@ class Twint:
                         break
                     else:
                         if time.time() - LAST.value > 2:
-                            with LOCK:
+                            if LOCK.acquire(timeout=.1):
                                 get.ForceNewTorIdentity(self.config)
                                 LAST.value = time.time()
+                                LOCK.release()
                         continue
                 else:
                     logme.critical(__name__+':Twint:Feed:' + str(e))

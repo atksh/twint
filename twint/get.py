@@ -558,13 +558,25 @@ async def RequestUrl(config, init, headers = []):
 
     return response
 
-def ForceNewTorIdentity(config):
+def ForceNewTorIdentity(config, tor_c=None):
     print('\033[93m ForceNewTorIdentity \033[0m')
     logme.debug(__name__+':ForceNewTorIdentity')
     try:
+        if tor_c is None:
+            tor_c = socket.create_connection(('127.0.0.1', config.Tor_control_port))
+        try:
+            tor_c.send('AUTHENTICATE "{}"\r\nSIGNAL NEWNYM\r\n'.format(config.Tor_control_password).encode())
+            response = tor_c.recv(1024)
+            if response != b'250 OK\r\n250 OK\r\n':
+                tor_c = socket.create_connection(('127.0.0.1', config.Tor_control_port))
+        except:
+            pass
+        else:
+            return
         tor_c = socket.create_connection(('127.0.0.1', config.Tor_control_port))
         tor_c.send('AUTHENTICATE "{}"\r\nSIGNAL NEWNYM\r\n'.format(config.Tor_control_password).encode())
         response = tor_c.recv(1024)
+
         if response != b'250 OK\r\n250 OK\r\n':
             sys.stderr.write('Unexpected response from Tor control port: {}\n'.format(response))
             logme.critical(__name__+':ForceNewTorIdentity:unexpectedResponse')
