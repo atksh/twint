@@ -195,16 +195,41 @@ def Limit(Limit, count):
 async def Multi(feed, config, conn):
     logme.debug(__name__+':Multi')
     count = 0
-    futures = []
-    for tweet in feed:
-        count += 1
-        logme.debug(__name__+':Multi:Favorites-profileFull')
-        link = tweet.find("a")["href"]
-        url = f"https://twitter.com{link}&lang=en"
+    try:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+            loop = asyncio.get_event_loop()
+            futures = []
+            for tweet in feed:
+                count += 1
+                if config.Favorites or config.Profile_full:
+                    logme.debug(__name__+':Multi:Favorites-profileFull')
+                    link = tweet.find("a")["href"]
+                    url = f"https://twitter.com{link}&lang=en"
+                elif config.User_full:
+                    logme.debug(__name__+':Multi:userFull')
+                    username = tweet.find("a")["name"]
+                    url = f"http://twitter.com/{username}?lang=en"
+                else:
+                    logme.debug(__name__+':Multi:else-url')
+                    link = tweet.find("a", "tweet-timestamp js-permalink js-nav js-tooltip")["href"]
+                    url = f"https://twitter.com{link}?lang=en"
 
-        logme.debug(__name__+':Multi:notUser-full-Run')
-        futures.append(Tweet(url, config, conn))
-    logme.debug(__name__+':Multi:asyncioGather')
-    await asyncio.gather(*futures)
+                if config.User_full:
+                    logme.debug(__name__+':Multi:user-full-Run')
+                    futures.append(loop.run_in_executor(executor, await User(url,
+                        config, conn)))
+                else:
+                    logme.debug(__name__+':Multi:notUser-full-Run')
+                    futures.append(loop.run_in_executor(executor, await Tweet(url,
+                        config, conn)))
+            logme.debug(__name__+':Multi:asyncioGather')
+            await asyncio.gather(*futures)
+    except Exception as e:
+        # TODO: fix error not error
+        # print(str(e) + " [x] get.Multi")
+        # will return "'NoneType' object is not callable"
+        # but still works
+        # logme.critical(__name__+':Multi:' + str(e))
+        pass
 
     return count
