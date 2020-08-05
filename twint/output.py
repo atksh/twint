@@ -52,7 +52,7 @@ def datecheck(datetimestamp, config):
 
         d = _formatDateTime(datetimestamp)
         s = _formatDateTime(config.Until)
-        
+
         if d > s:
            return False
     logme.debug(__name__+':datecheck:dateRangeFalse')
@@ -93,6 +93,7 @@ def _output(obj, output, config, **extra):
     if config.Output != None:
         if config.Store_csv:
             try:
+                print(obj.tweets)
                 write.Csv(obj, config)
                 logme.debug(__name__+':_output:CSV')
             except Exception as e:
