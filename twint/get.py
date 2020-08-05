@@ -45,6 +45,13 @@ user_agent_list = [
     'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)'
 ]
 
+try:
+    user_agent_list = pd.concat([pd.concat(pd.read_html(f'https://developers.whatismybrowser.com/useragents/explore/software_name/chrome/{i}')) for i in range(10)])['User agent'].tolist()
+except:
+    pass
+
+print(user_agent_list)
+
 def get_connector(config):
     logme.debug(__name__+':get_connector')
     _connector = None
