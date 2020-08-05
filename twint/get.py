@@ -630,7 +630,7 @@ def Limit(Limit, count):
 async def Multi(feed, config, conn):
     logme.debug(__name__+':Multi')
     count = 0
-    try:
+    """try:
         with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
             loop = asyncio.get_event_loop()
             futures = []
@@ -666,5 +666,17 @@ async def Multi(feed, config, conn):
         # but still works
         # logme.critical(__name__+':Multi:' + str(e))
         pass
+    """
+    futures = []
+    for tweet in feed:
+        count += 1
+        logme.debug(__name__+':Multi:Favorites-profileFull')
+        link = tweet.find("a")["href"]
+        url = f"https://twitter.com{link}&lang=en"
+
+        logme.debug(__name__+':Multi:notUser-full-Run')
+        futures.append(Tweet(url, config, conn))
+    logme.debug(__name__+':Multi:asyncioGather')
+    await asyncio.gather(*futures)
 
     return count
