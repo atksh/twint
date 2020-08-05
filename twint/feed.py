@@ -4,9 +4,11 @@ from json import loads
 
 import logging as logme
 
+parser = 'lxml'
+
 def Follow(response):
     logme.debug(__name__+':Follow')
-    soup = BeautifulSoup(response, "html.parser")
+    soup = BeautifulSoup(response, parser)
     follow = soup.find_all("td", "info fifty screenname")
     cursor = soup.find_all("div", "w-button-more")
     try:
@@ -18,7 +20,7 @@ def Follow(response):
 
 def Mobile(response):
     logme.debug(__name__+':Mobile')
-    soup = BeautifulSoup(response, "html.parser")
+    soup = BeautifulSoup(response, parser)
     tweets = soup.find_all("span", "metadata")
     max_id = soup.find_all("div", "w-button-more")
     try:
@@ -30,7 +32,7 @@ def Mobile(response):
 
 def MobileFav(response):
 
-    soup = BeautifulSoup(response, "html.parser")
+    soup = BeautifulSoup(response, parser)
     tweets = soup.find_all("table", "tweet")
     max_id = soup.find_all("div", "w-button-more")
     try:
@@ -44,7 +46,7 @@ def profile(response):
     logme.debug(__name__+':profile')
     json_response = loads(response)
     html = json_response["items_html"]
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(html, parser)
     feed = soup.find_all("div", "tweet")
 
     return feed, feed[-1]["data-item-id"]
@@ -53,6 +55,6 @@ def Json(response):
     logme.debug(__name__+':Json')
     json_response = loads(response)
     html = json_response["items_html"]
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(html, parser)
     feed = soup.find_all("div", "tweet")
     return feed, json_response["min_position"]
