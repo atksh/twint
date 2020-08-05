@@ -14,6 +14,7 @@ from aiohttp_socks import SocksConnector, SocksVer
 from . import url
 from .output import Tweets, Users
 from .user import inf
+import pandas as pd
 
 import logging as logme
 
@@ -47,7 +48,8 @@ user_agent_list = [
 
 try:
     user_agent_list = pd.concat([pd.concat(pd.read_html(f'https://developers.whatismybrowser.com/useragents/explore/software_name/chrome/{i}')) for i in range(10)])['User agent'].tolist()
-except:
+except Exception as e:
+    print(e)
     pass
 
 print(user_agent_list)
