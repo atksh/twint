@@ -9,7 +9,7 @@ import asyncio
 import concurrent.futures
 import random
 from json import loads
-from aiohttp_socks import SocksConnector, SocksVar
+from aiohttp_socks import SocksConnector, SocksVer
 
 from . import url
 from .output import Tweets, Users
@@ -51,15 +51,15 @@ def get_connector(config):
     if config.Proxy_host:
         if config.Proxy_host.lower() == "tor":
             _connector = SocksConnector(
-                socks_ver=SocksVar.SOCKS5,
+                socks_ver=SocksVer.SOCKS5,
                 host='127.0.0.1',
                 port=9050,
                 rdns=True)
         elif config.Proxy_port and config.Proxy_type:
             if config.Proxy_type.lower() == "socks5":
-                _type = SocksVar.SOCKS5
+                _type = SocksVer.SOCKS5
             elif config.Proxy_type.lower() == "socks4":
-                _type = SocksVar.SOCKS4
+                _type = SocksVer.SOCKS4
             elif config.Proxy_type.lower() == "http":
                 global httpproxy
                 httpproxy = "http://" + config.Proxy_host + ":" + str(config.Proxy_port)
