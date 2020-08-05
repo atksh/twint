@@ -4,7 +4,9 @@ from asyncio import get_event_loop, TimeoutError, ensure_future, new_event_loop,
 from . import datelock, feed, get, output, verbose, storage
 from .storage import db
 import multiprocessing as mp
+import time
 LOCK = mp.Lock()
+LAST = mp.Value('f', 0.0)
 
 import logging as logme
 
@@ -86,8 +88,10 @@ class Twint:
                         sys.stderr.write("Info: What is it? See https://stem.torproject.org/faq.html#can-i-interact-with-tors-controller-interface-directly\r\n")
                         break
                     else:
-                        with LOCK:
-                            get.ForceNewTorIdentity(self.config)
+                        if time.time() - LAST.value > 2:
+                            with LOCK:
+                                get.ForceNewTorIdentity(self.config)
+                                LAST.value = time.time()
                         continue
                 else:
                     logme.critical(__name__+':Twint:Feed:' + str(e))

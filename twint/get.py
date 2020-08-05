@@ -559,6 +559,7 @@ async def RequestUrl(config, init, headers = []):
     return response
 
 def ForceNewTorIdentity(config):
+    print('ForceNewTorIdentity')
     logme.debug(__name__+':ForceNewTorIdentity')
     try:
         tor_c = socket.create_connection(('127.0.0.1', config.Tor_control_port))
